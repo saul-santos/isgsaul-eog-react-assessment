@@ -10,7 +10,7 @@ const initialState = {
 };
 
 const slice = createSlice({
-  name: 'metricsList',
+  name: 'metrics',
   initialState,
   reducers: {
     metricsDataRecevied: (state, action: PayloadAction<string[]>) => {

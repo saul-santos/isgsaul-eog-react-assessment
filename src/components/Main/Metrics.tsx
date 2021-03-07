@@ -1,9 +1,9 @@
 import React from "react";
 import { Provider, createClient, useQuery } from 'urql';
 import { useDispatch, useSelector } from 'react-redux';
-import { actions } from './reducer';
+import { actions } from '../../store/metrics/reducer';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import SelectMultiple from "../../components/SelectMultiple";
+import SelectMultiple from "../SelectMultiple";
 import { IState } from '../../store';
 
 const client = createClient({
@@ -15,7 +15,7 @@ const query = `{
 }
 `;
 
-const getMetricsList = (state: IState) => state.metricsList;
+const getMetrics = (state: IState) => state.metrics;
 
 export default () => {
   return (
@@ -27,7 +27,7 @@ export default () => {
 
 function MetricsList() {
   const dispatch = useDispatch();
-  const { list, selectedMetrics } = useSelector(getMetricsList);
+  const { list, selectedMetrics } = useSelector(getMetrics);
 
   const [result] = useQuery({ query });
   const { data, fetching, error } = result;
