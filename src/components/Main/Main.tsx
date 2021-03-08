@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSubscription, useQuery } from 'urql';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { actions as metricsActions } from '../../store/metrics/reducer';
-import { actions as measuramentActions } from "../../store/measurements/reducer";
+import { actions as measuramentActions } from '../../store/measurements/reducer';
 import { IState } from '../../store';
-import SelectMultiple from "./SelectMultiple";
-import MeasurementCard from "./MeasurementCard";
-import Graph from "./Graph";
-import { metricsQuery, newMeasuramentsQuery, multipleMeasuramentsQuery } from "../../constants/queries";
+import SelectMultiple from './SelectMultiple';
+import MeasurementCard from './MeasurementCard';
+import Graph from './Graph';
+import { metricsQuery, newMeasuramentsQuery, multipleMeasuramentsQuery } from '../../constants/queries';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
