@@ -1,14 +1,10 @@
 import React from "react";
-import { Provider, createClient, useQuery } from 'urql';
+import { useQuery } from 'urql';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions } from '../../store/metrics/reducer';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import SelectMultiple from "../SelectMultiple";
 import { IState } from '../../store';
-
-const client = createClient({
-  url: 'https://react.eogresources.com/graphql',
-});
 
 const query = `{
   getMetrics
@@ -17,15 +13,7 @@ const query = `{
 
 const getMetrics = (state: IState) => state.metrics;
 
-export default () => {
-  return (
-    <Provider value={client}>
-      <MetricsList />
-    </Provider>
-  );
-};
-
-function MetricsList() {
+export default function MetricsList() {
   const dispatch = useDispatch();
   const { list, selectedMetrics } = useSelector(getMetrics);
 
