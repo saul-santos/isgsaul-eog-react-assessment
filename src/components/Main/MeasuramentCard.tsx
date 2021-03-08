@@ -29,7 +29,6 @@ const getMeasuraments = (state: IState) => state.measuraments;
 
 export default ({ label }: MeasuramentCardProps) => {
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
   const measuraments = useSelector(getMeasuraments);
   let value = 0;
 
