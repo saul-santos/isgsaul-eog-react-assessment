@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { LineChart, Line, XAxis, YAxis, Tooltip } from 'recharts';
 import { NUMBER_OF_READINGS_PER_HALF_HOUR, TABLE_MAP } from '../../constants/constants';
 import { IState } from '../../store';
+import formatDate from "../../utils/formatDate";
 
 const getMeasurements = (state: IState) => state.measurements;
 const getSelectedMetrics = (state: IState) => state.metrics.selectedMetrics;
@@ -41,12 +42,6 @@ export default () => {
 
     setLineChartData(_lineChartData);
   }, [measurements, selectedMetrics]);
-
-  function formatDate(value: string) {
-    if (!value) return '';
-    const date = new Date(value);
-    return date.toLocaleTimeString();
-  }
 
   const formatTooltipValues = (value: string, name: string) => ([`${value} ${TABLE_MAP[name].unit}`, name]);
 
