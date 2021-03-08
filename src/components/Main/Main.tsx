@@ -7,7 +7,7 @@ import SelectMultiple from './SelectMultiple';
 import MeasurementCard from './MeasurementCard';
 import Graph from './Graph';
 import useMetrics from "./useMetrics";
-import useMeasurement from './useMultipleMeasurements';
+import useNewMeasurement from './useNewMeasurement';
 import useMultipleMeasurements from './useMultipleMeasurements';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -31,7 +31,7 @@ export default function Main() {
   const { list, selectedMetrics } = useSelector(getMetrics);
 
   useMetrics();
-  useMeasurement();
+  useNewMeasurement();
   useMultipleMeasurements();
 
   return (
