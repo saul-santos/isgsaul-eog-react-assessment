@@ -1,15 +1,14 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useSubscription, useQuery } from 'urql';
+import { useSelector } from 'react-redux';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import { actions as metricsActions } from '../../store/metrics/reducer';
-import { actions as measuramentActions } from '../../store/measurements/reducer';
 import { IState } from '../../store';
 import SelectMultiple from './SelectMultiple';
 import MeasurementCard from './MeasurementCard';
 import Graph from './Graph';
-import { metricsQuery, newMeasuramentsQuery, multipleMeasuramentsQuery } from '../../constants/queries';
+import useMetrics from "./useMetrics";
+import useMeasurement from './useMultipleMeasurements';
+import useMultipleMeasurements from './useMultipleMeasurements';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -28,78 +27,18 @@ const useStyles = makeStyles((theme: Theme) =>
 const getMetrics = (state: IState) => state.metrics;
 
 export default function Main() {
-  const dispatch = useDispatch();
   const classes = useStyles();
-  const { list, selectedMetrics, multipleMeasuramentsQueryInput } = useSelector(getMetrics);
+  const { list, selectedMetrics } = useSelector(getMetrics);
 
-  // QUERIES INVOCATION
-  const [metricsRes] = useQuery({ query: metricsQuery });
-  const [newMeasuramentsRes] = useSubscription({ query: newMeasuramentsQuery });
-  const [multipleMeasuramentsRes] = useQuery({
-    query: multipleMeasuramentsQuery,
-    variables: { input: multipleMeasuramentsQueryInput },
-    pause: selectedMetrics.length === 0 || !multipleMeasuramentsQueryInput
-  });
-
-  // METRICS
-  React.useEffect(() => {
-    const { data, error } = metricsRes;
-
-    if (error) {
-      dispatch(metricsActions.metricsApiErrorReceived({ error: error.message }));
-      return;
-    }
-
-    if (!data) return;
-    const { getMetrics } = data;
-    dispatch(metricsActions.metricsDataRecevied(getMetrics));
-  }, [dispatch, metricsRes]);
-
-  const handleMetricsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    const selectedMetrics = event.target.value;
-    dispatch(metricsActions.setSelectedMetrics(selectedMetrics as string[]));
-  };
-
-
-  // NEW MEASURAMENT
-  React.useEffect(() => {
-    const { data, error } = newMeasuramentsRes;
-
-    if (error) {
-      dispatch(measuramentActions.measuramentsApiErrorReceived({ error: error.message }));
-      return;
-    }
-
-    if (!data) return;
-    const { newMeasurement } = data;
-    const isMetricSelected = selectedMetrics.includes(newMeasurement.metric);
-
-    if (isMetricSelected) {
-      dispatch(measuramentActions.setNewMeasurement(newMeasurement));
-    }
-  }, [dispatch, selectedMetrics, newMeasuramentsRes]);
-
-
-  // MULTIPLE MEASURAMENTS
-  React.useEffect(() => {
-    const { data, error } = multipleMeasuramentsRes;
-
-    if (error) {
-      dispatch(measuramentActions.measuramentsApiErrorReceived({ error: error.message }));
-      return;
-    }
-
-    if (!data) return;
-    const { getMultipleMeasurements } = data;
-    dispatch(measuramentActions.setMultipleMeasurements(getMultipleMeasurements));
-  }, [dispatch, multipleMeasuramentsRes]);
-
+  useMetrics();
+  useMeasurement();
+  useMultipleMeasurements();
 
   return (
     <div className={classes.root}>
       <Grid container spacing={3} justify="center">
         <Grid item>
-          <SelectMultiple label="Metrics" options={list} selected={selectedMetrics} handleChange={handleMetricsChange} />
+          <SelectMultiple label="Metrics" options={list} selected={selectedMetrics}/>
         </Grid>
       </Grid>
 

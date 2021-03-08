@@ -14,10 +14,10 @@ type Measurement = {
 export default () => {
   const measurements = useSelector(getMeasurements);
   const selectedMetrics = useSelector(getSelectedMetrics);
-  const [data, setData] = React.useState<Measurement[]>();
+  const [lineChartData, setLineChartData] = React.useState<Measurement[]>();
 
   React.useEffect(() => {
-    const _data = [];
+    const _lineChartData = [];
 
     for (let i = 0; i < NUMBER_OF_READINGS_PER_HALF_HOUR - 1; i++) {
       const item: { [key: string]: number } = {};
@@ -36,10 +36,10 @@ export default () => {
         }
       });
 
-      _data.push(item);
+      _lineChartData.push(item);
     }
 
-    setData(_data);
+    setLineChartData(_lineChartData);
   }, [measurements, selectedMetrics]);
 
   function formatDate(value: string) {
@@ -51,7 +51,7 @@ export default () => {
   const formatTooltipValues = (value: string, name: string) => ([`${value} ${TABLE_MAP[name].unit}`, name]);
 
   return (
-    <LineChart width={800} height={500} data={data} margin={{ top: 32, right: 20, bottom: 5, left: 32 }}>
+    <LineChart width={800} height={500} data={lineChartData} margin={{ top: 32, right: 20, bottom: 5, left: 32 }}>
       {selectedMetrics.map(metric => (
         <Line type="monotone" dataKey={metric} stroke={TABLE_MAP[metric].color} key={`line-${metric}`} />
       ))}

@@ -1,4 +1,6 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { actions as metricsActions } from '../../store/metrics/reducer';
 import { createStyles, makeStyles, useTheme, Theme } from '@material-ui/core/styles';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -50,12 +52,17 @@ export type SelectMultipleProps = {
   label: string,
   options: string[],
   selected: string[],
-  handleChange(event: React.ChangeEvent<{ value: unknown }>): any
 }
 
-export default ({ label, options, selected, handleChange }: SelectMultipleProps) => {
+export default ({ label, options, selected }: SelectMultipleProps) => {
   const classes = useStyles();
   const theme = useTheme();
+  const dispatch = useDispatch();
+
+  const handleMetricsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const selectedMetrics = event.target.value;
+    dispatch(metricsActions.setSelectedMetrics(selectedMetrics as string[]));
+  };
 
   return (
     <div>
@@ -66,7 +73,7 @@ export default ({ label, options, selected, handleChange }: SelectMultipleProps)
           id={label}
           multiple
           value={selected}
-          onChange={handleChange}
+          onChange={handleMetricsChange}
           input={<Input id={label} />}
           renderValue={(selected) => (
             <div className={classes.chips}>
