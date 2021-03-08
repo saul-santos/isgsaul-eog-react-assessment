@@ -5,6 +5,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import { IState } from '../../store';
+import { TABLE_MAP } from '../../constants/constants';
 
 const useStyles = makeStyles({
   root: {
@@ -43,7 +44,7 @@ export default ({ label }: MeasurementCardProps) => {
           {label}
         </Typography>
         <Typography variant="h5" component="h2">
-          {value}
+          {`${value} ${TABLE_MAP[label].unit}`}
         </Typography>
       </CardContent>
     </Card>

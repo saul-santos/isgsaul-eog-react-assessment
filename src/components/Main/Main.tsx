@@ -97,20 +97,20 @@ export default function Main() {
 
   return (
     <div className={classes.root}>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
+      <Grid container spacing={3} justify="center">
+        <Grid item>
           <SelectMultiple label="Metrics" options={list} selected={selectedMetrics} handleChange={handleMetricsChange} />
         </Grid>
       </Grid>
 
-      <Grid container spacing={3}>
-        {selectedMetrics.map(metric => <Grid item xs={2} key={metric}>
+      <Grid container spacing={3} justify="center">
+        {selectedMetrics.map(metric => <Grid item xs={3} key={metric}>
           <MeasurementCard label={metric} />
         </Grid>)}
       </Grid>
 
       <Grid container spacing={3} justify="center">
-        <Grid item xs={10} md={8}>
+        <Grid item>
           {selectedMetrics.length > 0 && <Graph />}
         </Grid>
       </Grid>
