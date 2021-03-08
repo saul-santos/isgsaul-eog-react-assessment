@@ -23,17 +23,17 @@ const useStyles = makeStyles({
   },
 });
 
-export type MeasuramentCardProps = { label: string };
+export type MeasurementCardProps = { label: string };
 
-const getMeasuraments = (state: IState) => state.measuraments;
+const getMeasurements = (state: IState) => state.measurements;
 
-export default ({ label }: MeasuramentCardProps) => {
+export default ({ label }: MeasurementCardProps) => {
   const classes = useStyles();
-  const measuraments = useSelector(getMeasuraments);
+  const measurements = useSelector(getMeasurements);
   let value = 0;
 
-  if(measuraments[label].length > 0) {
-    value = measuraments[label][measuraments[label].length - 1].value;
+  if(measurements[label].length > 0) {
+    value = measurements[label][measurements[label].length - 1].value;
   }
 
   return (

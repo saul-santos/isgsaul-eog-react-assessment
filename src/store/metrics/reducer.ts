@@ -4,9 +4,15 @@ export type ApiErrorAction = {
   error: string;
 };
 
+export type MeasuramentQueryInput = {
+  metricName: string,
+  after: number
+};
+
 const initialState = {
   list: [] as string[],
-  selectedMetrics:[] as string[]
+  selectedMetrics:[] as string[],
+  multipleMeasuramentsQueryInput: [] as MeasuramentQueryInput[]
 };
 
 const slice = createSlice({
@@ -19,7 +25,16 @@ const slice = createSlice({
     metricsApiErrorReceived: (state, action: PayloadAction<ApiErrorAction>) => state,
     
     setSelectedMetrics: (state, action: PayloadAction<string[]>) => {
-      state.selectedMetrics = action.payload;
+      const selectedMetrics = action.payload;
+      const currentDate = Date.now();
+      const ThirtyMinsAgoTime = new Date(currentDate - 30 * 60000).getTime();
+    
+      const multipleMeasuramentsQueryInput = selectedMetrics.map((metricName: string) => ({
+        metricName,
+        after: ThirtyMinsAgoTime
+      }));
+
+      return { ...state, selectedMetrics, multipleMeasuramentsQueryInput };
     },
   },
 });

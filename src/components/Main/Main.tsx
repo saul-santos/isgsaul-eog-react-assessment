@@ -4,42 +4,12 @@ import { useSubscription, useQuery } from 'urql';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import { actions as metricsActions } from '../../store/metrics/reducer';
-import { actions as measuramentActions } from "../../store/measuraments/reducer";
+import { actions as measuramentActions } from "../../store/measurements/reducer";
 import { IState } from '../../store';
 import SelectMultiple from "./SelectMultiple";
-import MeasuramentCard from "./MeasuramentCard";
-
-const metricsQuery = `{
-  getMetrics
-}
-`;
-
-const newMeasuramentsQuery = `
-subscription {
-  newMeasurement {
-    metric
-    at
-    value
-    unit
-  }
-}
-`;
-
-const multipleMeasuramentsQuery = `
-query($input: [MeasurementQuery]) {
-  getMultipleMeasurements(input: $input) {
-    metric
-    measurements {
-      metric
-      at
-      value
-      unit
-    }
-  }
-}
-`;
-
-const getMetrics = (state: IState) => state.metrics;
+import MeasurementCard from "./MeasurementCard";
+import Graph from "./Graph";
+import { metricsQuery, newMeasuramentsQuery, multipleMeasuramentsQuery } from "../../constants/queries";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -55,44 +25,75 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+const getMetrics = (state: IState) => state.metrics;
+
 export default function Main() {
   const dispatch = useDispatch();
   const classes = useStyles();
+  const { list, selectedMetrics, multipleMeasuramentsQueryInput } = useSelector(getMetrics);
 
-  const [multipleMeasuramentsRes] = useQuery({ query: multipleMeasuramentsQuery });
-  
-  // METRICS
-  const { list, selectedMetrics } = useSelector(getMetrics);
+  // QUERIES INVOCATION
   const [metricsRes] = useQuery({ query: metricsQuery });
+  const [newMeasuramentsRes] = useSubscription({ query: newMeasuramentsQuery });
+  const [multipleMeasuramentsRes] = useQuery({
+    query: multipleMeasuramentsQuery,
+    variables: { input: multipleMeasuramentsQueryInput },
+    pause: selectedMetrics.length === 0 || !multipleMeasuramentsQueryInput
+  });
 
+  // METRICS
   React.useEffect(() => {
     const { data, error } = metricsRes;
+
     if (error) {
       dispatch(metricsActions.metricsApiErrorReceived({ error: error.message }));
       return;
     }
+
     if (!data) return;
     const { getMetrics } = data;
     dispatch(metricsActions.metricsDataRecevied(getMetrics));
   }, [dispatch, metricsRes]);
 
   const handleMetricsChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    dispatch(metricsActions.setSelectedMetrics(event.target.value as string[]));
+    const selectedMetrics = event.target.value;
+    dispatch(metricsActions.setSelectedMetrics(selectedMetrics as string[]));
   };
 
-  // NEW MEASURAMENT
-  const [measuramentsRes] = useSubscription({ query: newMeasuramentsQuery });
 
+  // NEW MEASURAMENT
   React.useEffect(() => {
-    const { data, error } = measuramentsRes;
+    const { data, error } = newMeasuramentsRes;
+
     if (error) {
       dispatch(measuramentActions.measuramentsApiErrorReceived({ error: error.message }));
       return;
     }
+
     if (!data) return;
     const { newMeasurement } = data;
-    dispatch(measuramentActions.newMeasurament(newMeasurement));
-  }, [dispatch, measuramentsRes]);
+    const isMetricSelected = selectedMetrics.includes(newMeasurement.metric);
+
+    if (isMetricSelected) {
+      dispatch(measuramentActions.setNewMeasurement(newMeasurement));
+    }
+  }, [dispatch, selectedMetrics, newMeasuramentsRes]);
+
+
+  // MULTIPLE MEASURAMENTS
+  React.useEffect(() => {
+    const { data, error } = multipleMeasuramentsRes;
+
+    if (error) {
+      dispatch(measuramentActions.measuramentsApiErrorReceived({ error: error.message }));
+      return;
+    }
+
+    if (!data) return;
+    const { getMultipleMeasurements } = data;
+    dispatch(measuramentActions.setMultipleMeasurements(getMultipleMeasurements));
+  }, [dispatch, multipleMeasuramentsRes]);
+
 
   return (
     <div className={classes.root}>
@@ -104,8 +105,14 @@ export default function Main() {
 
       <Grid container spacing={3}>
         {selectedMetrics.map(metric => <Grid item xs={2} key={metric}>
-          <MeasuramentCard label={metric} />
+          <MeasurementCard label={metric} />
         </Grid>)}
+      </Grid>
+
+      <Grid container spacing={3} justify="center">
+        <Grid item xs={10} md={8}>
+          {selectedMetrics.length > 0 && <Graph />}
+        </Grid>
       </Grid>
     </div>
   );
